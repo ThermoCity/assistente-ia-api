@@ -1,0 +1,52 @@
+### Pergunta sobre os guias
+POST http://localhost:8081/chat
+Content-Type: application/json
+
+{
+  "conversationId": "agente-1",
+  "message": "Quais sinais de alerta devo observar numa ligação com um idoso num dia de calor?"
+}
+
+### Continuação da mesma conversa (usa a memória)
+POST http://localhost:8081/chat
+Content-Type: application/json
+
+{
+  "conversationId": "agente-1",
+  "message": "E se ele estiver confuso?"
+}
+
+### Pergunta sobre medicamentos (guia do CDC)
+POST http://localhost:8081/chat
+Content-Type: application/json
+
+{
+  "conversationId": "agente-2",
+  "message": "Quais remédios aumentam o risco no calor?"
+}
+
+### Fora do tema (deve recusar)
+POST http://localhost:8081/chat
+Content-Type: application/json
+
+{
+  "conversationId": "agente-3",
+  "message": "Me ajuda a fazer um código em Python?"
+}
+
+### Requisição inválida (400)
+POST http://localhost:8081/chat
+Content-Type: application/json
+
+{
+  "conversationId": "agente-4"
+}
+
+### Pergunta muito longa (400, PerguntaMuitoLongaException)
+POST http://localhost:8081/chat
+Content-Type: application/json
+
+{
+  "conversationId": "agente-5",
+  "message": "calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor "
+}
