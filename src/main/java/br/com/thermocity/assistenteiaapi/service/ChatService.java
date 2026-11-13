@@ -9,7 +9,9 @@ import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,6 +34,8 @@ public class ChatService {
             Fontes:
             - Baseie suas respostas nos trechos dos guias oficiais fornecidos no contexto
               (Ministério da Saúde, Secretaria de Saúde do Rio de Janeiro e CDC).
+            - Cada trecho começa com a referência do guia, no formato [Fonte: título – instituição (data)].
+              Ao final da resposta, liste as fontes usadas nesse mesmo formato. Cite só fontes que vieram nos trechos.
             - Se a resposta não estiver nos trechos, diga que não encontrou essa informação nos guias
               e oriente consultar o enfermeiro ou o médico da equipe. Nunca invente.
             - Não invente quantidades de água, doses, temperaturas ou telefones. O único telefone que você
@@ -52,13 +56,16 @@ public class ChatService {
             .maxMessages(10)
             .build();
 
-    public ChatService(ChatClient.Builder builder, VectorStore vectorStore) {
+    public ChatService(ChatClient.Builder builder, VectorStore vectorStore,
+                       @Value("${thermocity.rag.trechos:4}") int quantidadeTrechos) {
         this.chatClient = builder
                 .defaultSystem(SYSTEM_PROMPT) // persona e regras do assistente
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(), // advisor para logar as mensagens
                         MessageChatMemoryAdvisor.builder(memory).build(), // advisor para manter o histórico de mensagens
-                        QuestionAnswerAdvisor.builder(vectorStore).build() // advisor do RAG: busca trechos dos guias oficiais
+                        QuestionAnswerAdvisor.builder(vectorStore)
+                                .searchRequest(SearchRequest.builder().topK(quantidadeTrechos).build()) // os k trechos mais próximos
+                                .build() // advisor do RAG: busca trechos dos guias oficiais
                 )
                 .build();
     }
