@@ -50,3 +50,12 @@ Content-Type: application/json
   "conversationId": "agente-5",
   "message": "calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor calor "
 }
+### Roteiro de contato de uma pessoa da lista de hoje (use um pessoa.id de GET /listas/hoje da API de cadastro)
+### Gera na primeira vez; devolve o guardado nas próximas
+GET http://localhost:8081/listas/hoje/19364/orientacao
+
+### Pessoa que existe mas não está na lista de hoje (404)
+GET http://localhost:8081/listas/hoje/1/orientacao
+
+### Pessoa inexistente (404)
+GET http://localhost:8081/listas/hoje/999999/orientacao

@@ -32,6 +32,7 @@ public class OrientacaoContato {
     private Long pessoaId;
     private LocalDate dataLista;
     private Integer nivelCalor;
+    @Column(name = "ic_previsto_c")
     private Double icPrevistoC;
     @Column(columnDefinition = "text")
     private String roteiro;
@@ -41,6 +42,7 @@ public class OrientacaoContato {
     private String refugioNome;
     @Column(length = 300)
     private String refugioEndereco;
+    @Column(name = "refugio_distancia_m")
     private Integer refugioDistanciaMetros;
     @Column(columnDefinition = "text")
     private String fontes;

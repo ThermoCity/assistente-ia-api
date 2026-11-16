@@ -1,6 +1,8 @@
 package br.com.thermocity.assistenteiaapi.dto;
 
-// Tudo o que o modelo recebe sobre a pessoa. Não tem nome, telefone, endereço nem coordenadas (LGPD).
+import java.util.List;
+
+// Tudo o que o modelo recebe sobre a pessoa.
 public record PerfilContato(
         Integer idade,
         boolean moraSozinha,
@@ -9,5 +11,6 @@ public record PerfilContato(
         int nivelCalor,
         Double icPrevistoC,
         String refugioNome,
-        Integer refugioDistanciaMetros
+        Integer refugioDistanciaMetros,
+        List<String> motivosPrioridade
 ) {}
