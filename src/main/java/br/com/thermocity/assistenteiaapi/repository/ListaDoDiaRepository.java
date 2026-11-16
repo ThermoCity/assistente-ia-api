@@ -16,9 +16,10 @@ public interface ListaDoDiaRepository extends Repository<Pessoa, Long> {
 
     /** Item da pessoa numa lista aberta da data (se houver mais de uma, a de maior nível). */
     @Query(value = """
-            select l.nivel_calor as nivelCalor, i.posicao as posicao, i.motivos as motivos
+            select l.nivel_calor as nivelCalor, i.posicao as posicao, i.motivos as motivos, u.nome as ubsNome
               from tmc_lista_item i
               join tmc_lista_busca_ativa l on l.id = i.lista_id
+              left join tmc_servico u on u.id = l.ubs_id
              where i.pessoa_id = :pessoaId
                and l.data_lista = :data
                and l.status = 'ABERTA'
@@ -26,12 +27,14 @@ public interface ListaDoDiaRepository extends Repository<Pessoa, Long> {
              limit 1""", nativeQuery = true)
     Optional<ItemDaLista> itemDaPessoa(@Param("pessoaId") Long pessoaId, @Param("data") LocalDate data);
 
-    /** O que a lista diz sobre a pessoa: nível de calor da lista, posição e motivos ("a · b · c"). */
+    /** O que a lista diz sobre a pessoa: nível de calor, posição, motivos ("a · b · c") e a UBS responsável. */
     interface ItemDaLista {
         Integer getNivelCalor();
 
         Integer getPosicao();
 
         String getMotivos();
+
+        String getUbsNome();
     }
 }

@@ -78,7 +78,9 @@ public class OrientacaoService {
                 icPrevistoC,
                 refugio == null ? null : refugio.nome(),
                 refugio == null ? null : refugio.distanciaMetros(),
-                naLista.motivos());
+                naLista.motivos(),
+                pessoa.getSexo(),
+                naLista.ubsNome());
 
         try {
             List<Document> trechos = buscaGuias.buscar(perfil);

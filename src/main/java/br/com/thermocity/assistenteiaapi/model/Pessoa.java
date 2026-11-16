@@ -1,5 +1,6 @@
 package br.com.thermocity.assistenteiaapi.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -27,4 +28,5 @@ public class Pessoa {
     private boolean moraSozinho;
     private boolean mobilidadeReduzida;
     private boolean condicaoCronica;
+    private String sexo;
 }

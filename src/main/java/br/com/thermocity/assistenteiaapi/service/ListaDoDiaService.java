@@ -12,8 +12,8 @@ import java.util.List;
 @Service
 public class ListaDoDiaService {
 
-    /** A pessoa na lista do dia: nível de calor da lista, posição e motivos da prioridade. */
-    public record PessoaNaLista(int nivelCalor, int posicao, List<String> motivos) {
+    /** A pessoa na lista do dia: nível de calor da lista, posição, motivos da prioridade e UBS responsável. */
+    public record PessoaNaLista(int nivelCalor, int posicao, List<String> motivos, String ubsNome) {
     }
 
     private final ListaDoDiaRepository listas;
@@ -25,7 +25,7 @@ public class ListaDoDiaService {
     /** Lança PessoaForaDaListaException (404) se a pessoa não estiver numa lista aberta na data. */
     public PessoaNaLista daPessoa(Long pessoaId, LocalDate data) {
         return listas.itemDaPessoa(pessoaId, data)
-                .map(i -> new PessoaNaLista(i.getNivelCalor(), i.getPosicao(), motivos(i.getMotivos())))
+                .map(i -> new PessoaNaLista(i.getNivelCalor(), i.getPosicao(), motivos(i.getMotivos()), i.getUbsNome()))
                 .orElseThrow(() -> new PessoaForaDaListaException(pessoaId));
     }
 

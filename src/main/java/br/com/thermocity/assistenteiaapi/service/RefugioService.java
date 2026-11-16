@@ -10,27 +10,25 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-// Refúgio mais próximo da pessoa, em linha reta. Primeiro os públicos confirmados; se não houver, os potenciais.
+// Refúgio mais próximo da pessoa, em linha reta, entre todos os cadastrados (públicos e potenciais),
+// a mesma regra da lista do dia da API de cadastro.
 @Service
 @RequiredArgsConstructor
 public class RefugioService {
 
     private static final double RAIO_TERRA_M = 6_371_008.8;
+    /** Refúgios públicos confirmados ("manter") e os que dependem de parceria ("potencial"). */
+    static final List<String> REVISOES = List.of("manter", "potencial");
 
     private final RefugioRepository repository;
 
     public Optional<RefugioIndicado> maisProximo(Double lat, Double lon) {
         if (lat == null || lon == null) return Optional.empty();
 
-        for (String revisao : List.of("manter", "potencial")) {
-            Optional<RefugioIndicado> refugio = repository.findByTipoAndCoordStatusAndRevisao("REFUGIO", "OK", revisao)
-                    .stream()
-                    .filter(r -> r.getLat() != null && r.getLon() != null)
-                    .min(Comparator.comparingDouble(r -> distanciaMetros(lat, lon, r.getLat(), r.getLon())))
-                    .map(r -> paraIndicado(r, lat, lon));
-            if (refugio.isPresent()) return refugio;
-        }
-        return Optional.empty();
+        return repository.findByTipoAndCoordStatusAndRevisaoIn("REFUGIO", "OK", REVISOES).stream()
+                .filter(r -> r.getLat() != null && r.getLon() != null)
+                .min(Comparator.comparingDouble(r -> distanciaMetros(lat, lon, r.getLat(), r.getLon())))
+                .map(r -> paraIndicado(r, lat, lon));
     }
 
     private static RefugioIndicado paraIndicado(Refugio r, double lat, double lon) {
