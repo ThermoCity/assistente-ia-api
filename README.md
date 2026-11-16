@@ -1,5 +1,20 @@
 # assistente-ia-api — ThermoCity
 
+## 👥 Integrantes
+
+| Nome | RM |
+| --- | --- |
+| Arthur Graciani | RM561728 |
+| Gustavo Oliveira | RM566358 |
+| João Pedro Scarpin | RM565421 |
+| Lucas Hideki | RM565355 |
+| Wesley Andrade | RM563593 |
+
+FIAP · Global Solution 2026/2 (CitizenTech) · Disruptive Architectures: IoT, IoB & Generative IA ·
+Repositório: https://github.com/ThermoCity/assistente-ia-api
+
+---
+
 API de IA generativa do ThermoCity. Ajuda o agente de
 saúde de uma UBS de Presidente Prudente-SP no contato por telefone com idosos durante uma onda de calor:
 
@@ -10,6 +25,49 @@ saúde de uma UBS de Presidente Prudente-SP no contato por telefone com idosos d
 
 A IA **não decide quem é contatado** (isso é a lista priorizada da API de cadastro, com regra explicável) e
 **não diagnostica**: ela organiza, em linguagem simples, o que os guias oficiais dizem para aquela situação.
+
+---
+
+## Arquitetura
+
+Onde o assistente fica dentro do ThermoCity e com quem conversa:
+
+```mermaid
+flowchart LR
+    subgraph Usuarios[Usuários]
+        AG[Agente de saúde<br/>app Mobile]
+    end
+
+    subgraph ThermoCity[ThermoCity no Azure]
+        CAD[api-java-cadastro<br/>Java · pessoas e lista do dia]
+        IA[assistente-ia-api<br/>Java · Spring AI]
+        DB[(PostgreSQL<br/>tabelas TMC_)]
+        VS[(Vector store em memória<br/>trechos dos 5 guias)]
+    end
+
+    subgraph Google[Google Gemini API]
+        LLM[Gemini 2.5 Flash<br/>texto]
+        EMB[gemini-embedding-001<br/>embeddings]
+    end
+
+    GUIAS[/Guias oficiais<br/>src/main/resources/docs/]
+
+    AG -- lista do dia --> CAD
+    AG -- POST /chat<br/>GET /listas/hoje/id/orientacao --> IA
+    CAD -- grava lista e itens --> DB
+    IA -- lê pessoa, lista, refúgios<br/>grava orientações --> DB
+    GUIAS -- na subida --> IA
+    IA -- trechos --> EMB
+    IA <--> VS
+    IA -- perfil sem identificação<br/>+ trechos recuperados --> LLM
+```
+
+- A **api-java-cadastro** decide quem entra na lista de busca ativa (regra explicável, sem IA) e grava a lista
+  no PostgreSQL compartilhado.
+- O **assistente-ia-api** só **lê** a lista, as pessoas e os refúgios, e grava apenas as orientações geradas
+  (`tmc_orientacao_contato`).
+- A Gemini API recebe o texto dos guias (para os embeddings) e um perfil **sem nome, telefone, endereço ou
+  coordenadas** (para o roteiro). Detalhes do fluxo de cada endpoint abaixo.
 
 ---
 
@@ -154,6 +212,9 @@ de que a orientação não é diagnóstico.
 Requisitos: **JDK 25**, PostgreSQL com as tabelas `TMC_` (repositório `thermocity-banco-de-dados-postgres`,
 incluindo `tmc_orientacao_contato`) e uma chave da Gemini API.
 
+As variáveis necessárias estão em [`.env.example`](.env.example) (só exemplos, sem credenciais). Defina-as no
+terminal, na configuração de execução do IntelliJ ou, no Azure, nas configurações do App Service:
+
 ```powershell
 $env:DB_URL="jdbc:postgresql://localhost:5432/base_territorial"
 $env:DB_USERNAME="..."
@@ -172,7 +233,6 @@ Exemplos de chamadas em `test.http`.
 | 400 | pergunta vazia, com mais de 1.000 caracteres ou id inválido |
 | 404 | pessoa inexistente ou fora da lista de busca ativa de hoje |
 | 503 | o modelo não respondeu no chat |
-,
 
 ---
 
@@ -181,3 +241,20 @@ Exemplos de chamadas em `test.http`.
 As respostas foram avaliadas com 18 casos (12 perfis de idoso × níveis de calor × refúgio e 6 perguntas ao chat)
 e critérios de uso das fontes, ausência de diagnóstico, menção ao refúgio e tempo de resposta. Casos, critérios,
 resultados e análise em [docs/avaliacao-ia.md](docs/avaliacao-ia.md).
+
+As situações de falha (modelo fora do ar, pessoa inexistente ou fora da lista, pergunta longa demais) também
+foram testadas: com o modelo fora do ar, o chat responde 503 e o roteiro cai na orientação padrão do nível
+(`geradaSemIa: true`), sem parar o atendimento. Ver a seção "Situações de falha" do mesmo documento.
+
+---
+
+## Declaração de uso de IA
+
+Além do Gemini, que faz parte da solução (descrito em "Modelos e tecnologias"), o grupo usou IA generativa
+no desenvolvimento:
+
+| Ferramenta | Para quê |
+|---|---|
+| Claude (Anthropic) | pesquisa e conferência das fontes oficiais, sugestões de código e de prompt, explicação de erros e revisão dos textos e da documentação |
+
+Todo o código, os prompts e os textos foram revisados e testados pelo grupo, que entende e responde por eles.
