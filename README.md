@@ -173,3 +173,11 @@ Exemplos de chamadas em `test.http`.
 | 404 | pessoa inexistente ou fora da lista de busca ativa de hoje |
 | 503 | o modelo não respondeu no chat |
 ,
+
+---
+
+## Avaliação
+
+As respostas foram avaliadas com 18 casos (12 perfis de idoso × níveis de calor × refúgio e 6 perguntas ao chat)
+e critérios de uso das fontes, ausência de diagnóstico, menção ao refúgio e tempo de resposta. Casos, critérios,
+resultados e análise em [docs/avaliacao-ia.md](docs/avaliacao-ia.md).
